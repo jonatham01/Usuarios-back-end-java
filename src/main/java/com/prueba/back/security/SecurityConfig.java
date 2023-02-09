@@ -62,14 +62,6 @@ public class SecurityConfig  {
                 .build();
 
     }
-    /*
-    @Override public void configure(WebSecurity web) throws Exception {
-    web.ignoring().antMatchers("/v2/api-docs/**");
-    web.ignoring().antMatchers("/swagger.json");
-    web.ignoring().antMatchers("/swagger-ui.html");
-    web.ignoring().antMatchers("/swagger-resources/**");
-    web.ignoring().antMatchers("/webjars/**");
-}
-*/
+
 
 }

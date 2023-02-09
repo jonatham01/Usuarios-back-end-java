@@ -71,6 +71,11 @@ public class UserController {
         }
     }
 
+    @GetMapping("/apellido/{apellido}")
+    public ResponseEntity getByLastName(@PathVariable("apellido") String apellido){
+        return new ResponseEntity<>(userRepository.findByLastName(apellido),HttpStatus.OK);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable ("id") int id){
         try{
