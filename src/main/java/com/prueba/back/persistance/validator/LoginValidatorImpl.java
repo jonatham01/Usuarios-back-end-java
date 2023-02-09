@@ -18,18 +18,19 @@ public class LoginValidatorImpl {
 
     public void validator(int id, UserLogin data)throws  ApiUnProcessableEntity{
 
-
         userRepository.findById(id).
                 map(user -> {
                     this.pass=user.getPassword();
                     return  user ;
                 });
 
-
-        if(!encryptService.verifyPassword(
+        Boolean verifyAutentication = encryptService.verifyPassword(
                 data.getPassword(),
                 this.pass
-        )){ this.message("Contraseña incorrecta");}
+        );
+
+
+        if(!verifyAutentication){ this.message("Contraseña incorrecta");}
 
         if(data.getEmail().isEmpty()){
             this.message("Por favor ingrese correo electronico");

@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+
 
 
 @RestController
@@ -42,13 +42,6 @@ public class UserController {
     @Autowired
     private LoginValidatorImpl loginValidator;
 
-
-
-    @GetMapping("/pass/autenticated")
-    public ResponseEntity<String> getpass() {
-        return new ResponseEntity<>(encryptService.encryptPassword("hello"), HttpStatus.OK);
-
-    }
 
     @PostMapping("/save/autenticated")
     public  ResponseEntity save(@RequestBody User user) throws ApiUnProcessableEntity {
@@ -107,16 +100,9 @@ public class UserController {
     public ResponseEntity login(@PathVariable("id") int id,@RequestBody UserLogin data) throws ApiUnProcessableEntity {
 
         loginValidator.validator(id,data);
-        return userRepository.findById(id)
-                .map(user->{
-                   // Boolean condicion= encryptService.verifyPassword(data.getPassword(),user.getPassword() );
-                   // if(!condicion) { return new ResponseEntity(HttpStatus.NOT_FOUND);}
-                    //else   {
-                        UserDetails userDetails= userDetailsService.loadUserByUsername(data.getEmail());
-                        String jwt= jwtSecurity.generate(userDetails);
-                        return  new ResponseEntity<>(new AuthenticationResponse(jwt),HttpStatus.OK);
-                   // }
-                }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        UserDetails userDetails= userDetailsService.loadUserByUsername(data.getEmail());
+        String jwt= jwtSecurity.generate(userDetails);
+        return  new ResponseEntity<>(new AuthenticationResponse(jwt),HttpStatus.OK);
     }
 
 }
