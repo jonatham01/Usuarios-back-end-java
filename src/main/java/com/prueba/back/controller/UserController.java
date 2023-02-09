@@ -5,13 +5,13 @@ import com.prueba.back.persistance.entity.User;
 import com.prueba.back.persistance.entity.UserLogin;
 import com.prueba.back.persistance.repository.UserRepository;
 import com.prueba.back.persistance.validator.ApiUnProcessableEntity;
+import com.prueba.back.persistance.validator.LoginValidatorImpl;
 import com.prueba.back.persistance.validator.UserValidator;
 import com.prueba.back.security.JWTSecurity;
 import com.prueba.back.service.EncryptServiceImpl;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,6 +39,9 @@ public class UserController {
     @Autowired
     private UserValidator userValidator;
 
+    @Autowired
+    private LoginValidatorImpl loginValidator;
+
 
 
     @GetMapping("/pass/autenticated")
@@ -57,7 +60,6 @@ public class UserController {
     public ResponseEntity getAll(){
         return new ResponseEntity<>(userRepository.findAll(),HttpStatus.OK);
     }
-
 
     @GetMapping("/id/{id}")
     public ResponseEntity getById(@PathVariable("id") int id){
@@ -102,16 +104,18 @@ public class UserController {
     }
 
     @PostMapping("/login/{id}/autenticated")
-    public ResponseEntity login(@PathVariable("id") int id,@RequestBody UserLogin data){
+    public ResponseEntity login(@PathVariable("id") int id,@RequestBody UserLogin data) throws ApiUnProcessableEntity {
+
+        loginValidator.validator(id,data);
         return userRepository.findById(id)
                 .map(user->{
-                    Boolean condicion= encryptService.verifyPassword(data.getPassword(),user.getPassword() );
-                    if(!condicion) { return new ResponseEntity(HttpStatus.NOT_FOUND);}
-                    else   {
-                        UserDetails userDetails= userDetailsService.loadUserByUsername("username");
+                   // Boolean condicion= encryptService.verifyPassword(data.getPassword(),user.getPassword() );
+                   // if(!condicion) { return new ResponseEntity(HttpStatus.NOT_FOUND);}
+                    //else   {
+                        UserDetails userDetails= userDetailsService.loadUserByUsername(data.getEmail());
                         String jwt= jwtSecurity.generate(userDetails);
                         return  new ResponseEntity<>(new AuthenticationResponse(jwt),HttpStatus.OK);
-                    }
+                   // }
                 }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
